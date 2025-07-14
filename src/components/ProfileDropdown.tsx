@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { User, LogOut, Lock } from "lucide-react";
 import { useUser, UserRole } from "@/contexts/UserContext";
 import { useNavigate } from "react-router-dom";
+import { authService } from '@/contexts/AuthService';
 
 const ProfileDropdown = () => {
   const { user, logout } = useUser();
@@ -104,7 +105,10 @@ const ProfileDropdown = () => {
           <span>Reset Password</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer text-red-600"
-          onClick={() => navigate("/adminpanel/login")}
+          onClick={async (e) => {
+            await authService.signOut()
+            navigate("/adminpanel/login")
+          }}
           >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Logout</span>

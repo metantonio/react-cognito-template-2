@@ -68,7 +68,7 @@ const mockUsers: { [key in UserRole]: User } = {
 };
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(mockUsers.admin); //change this from mockUsers.admin to null later
+  const [user, setUser] = useState<User | null>(mockUsers.guest); //change this from mockUsers.admin to null later
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);

@@ -28,7 +28,7 @@ const Login = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // For demo purposes, just navigate to the main app
-    navigate('/adminpanel/dashboard');
+    navigate('/adminpanel');
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +81,7 @@ const Login = () => {
           if (isValidUrl(absoluteUrl)) {
             window.location.href = absoluteUrl;
           } else {
-            navigate('/adminpanel/users');
+            navigate('/adminpanel');
           }
         }
       } else {

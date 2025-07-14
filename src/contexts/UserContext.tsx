@@ -14,6 +14,7 @@ export interface User {
   userAttributes?: Record<string, string>;
   name: string;
   given_name: string;
+  family_name: string;
 }
 
 interface UserContextType {
@@ -59,27 +60,32 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const mapCognitoUserToAppUser = (cognitoUser: any): User => {
+  const mapCognitoUserToAppUser = (cognitoUser: any, userAttributes: any): User => {
     // Map cognito data to the user structure
-    console.log("cognitoUser: ",cognitoUser)
-    return {
+
+    const tempObj = {
       id: cognitoUser.username,
       username: cognitoUser.username,
       email: cognitoUser.signInDetails?.loginId || '',
       role: (cognitoUser.attributes?.['custom:role'] as UserRole) || 'admin',
       cognitoId: cognitoUser.userId,
-      userAttributes: cognitoUser.userAttributes
-    };
+      name: userAttributes.given_name || "",
+      family_name: userAttributes.family_name || ""
+    }
+
+    console.log("cognitoUser returned: ", tempObj)
+
+    return tempObj
   };
-  
+
   const loadUser = async () => {
     setIsLoading(true);
     try {
-      const cognitoUser = await authService.getCurrentUser();
+      const {cognitoUser, userAttributes} = await authService.getCurrentUser();
       const session = await authService.getSession();
 
       if (cognitoUser && session?.tokens?.idToken) {
-        const appUser = mapCognitoUserToAppUser(cognitoUser);
+        const appUser = mapCognitoUserToAppUser(cognitoUser, userAttributes);
         setUser(appUser);
         setToken(session.tokens.idToken.toString());
         setIsAuthenticated(true);
@@ -91,9 +97,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const login = async (cognitoUser: any, authToken: string) => {
-    const appUser = mapCognitoUserToAppUser(cognitoUser);
-    console.log(appUser)
+  const login = async (cognitoUser: any, authToken: string, userAttributes: any) => {
+    
+    const appUser = mapCognitoUserToAppUser(cognitoUser, userAttributes);
+    //console.log(appUser)
     setUser(appUser);
     setToken(authToken);
     setIsAuthenticated(true);
@@ -154,14 +161,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ 
-      user, 
+    <UserContext.Provider value={{
+      user,
       token,
       isLoading,
       isAuthenticated,
-      login, 
-      logout, 
-      updateUser, 
+      login,
+      logout,
+      updateUser,
       hasPermission,
       refreshToken,
       validateToken

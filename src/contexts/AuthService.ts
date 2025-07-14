@@ -9,12 +9,13 @@ export const authService = {
             const userAttributes = await fetchUserAttributes();
             console.log("userAttributes: ", userAttributes);
             if (userAttributes) {
-                const name = userAttributes.name; // Or userAttributes.given_name, userAttributes.family_name
+                const name = userAttributes.given_name; // Or userAttributes.given_name, userAttributes.family_name
                 console.log("User's name:", name);
-                currentUser["userAttributes"] = userAttributes
-                return currentUser
+                //currentUser["name"] = name
+                //currentUser["lastname"] = userAttributes.family_name
+                //return currentUser
             }
-            return await currentUser;
+            return await currentUser, userAttributes;
         } catch (error) {
             console.error('Error getting current user:', error);
             return null;

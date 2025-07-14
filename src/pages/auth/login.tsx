@@ -60,7 +60,7 @@ const Login = () => {
 
         const userAttributes = await fetchUserAttributes();
         if (userAttributes) {
-          const name = userAttributes.name; // Or userAttributes.given_name, userAttributes.family_name
+          const name = userAttributes.given_name || ""; // Or userAttributes.given_name, userAttributes.family_name
           console.log("userAttributes: ", userAttributes);
         }
 
@@ -68,7 +68,7 @@ const Login = () => {
           throw new Error('No ID token found in session');
         }
 
-        await login(currentUser, idToken.toString());
+        await login(currentUser, idToken.toString(), userAttributes);
 
         const redirectUrl = idToken.payload.website || currentUser.signInDetails?.loginId || '';
 

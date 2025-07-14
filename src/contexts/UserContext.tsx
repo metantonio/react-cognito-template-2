@@ -73,7 +73,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       family_name: userAttributes.family_name || ""
     }
 
-    console.log("cognitoUser returned: ", tempObj)
+    //console.log("cognitoUser returned: ", tempObj)
 
     return tempObj
   };

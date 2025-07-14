@@ -136,6 +136,8 @@ const Login = () => {
           const session = await fetchAuthSession();
           const idToken = session.tokens?.idToken;
           const userAttributes = await fetchUserAttributes();
+          const groups = session.tokens.accessToken.payload['cognito:groups'] || [];
+          console.log('User groups:', groups);
 
           if (!idToken) {
             throw new Error('No ID token found in session');

@@ -7,7 +7,7 @@ export const authService = {
             const currentUser = getCurrentUser()
             
             const userAttributes = await fetchUserAttributes();
-            console.log("userAttributes: ", userAttributes);
+            //console.log("userAttributes: ", userAttributes);
             if (userAttributes) {
                 const name = userAttributes.given_name; // Or userAttributes.given_name, userAttributes.family_name
                 console.log("User's name:", name);

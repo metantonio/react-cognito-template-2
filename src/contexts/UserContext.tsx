@@ -92,7 +92,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (cognitoUser: any, authToken: string) => {
     const appUser = mapCognitoUserToAppUser(cognitoUser);
-    console.log(AppUser)
+    console.log(appUser)
     setUser(appUser);
     setToken(authToken);
     setIsAuthenticated(true);

@@ -30,6 +30,19 @@ interface UserContextType {
   validateToken: () => Promise<boolean>;
 }
 
+interface Session {
+  tokens?: {
+    accessToken?: {
+      payload: {
+        'cognito:groups'?: string[];
+      };
+    };
+    idToken?: {
+      toString(): string;
+    };
+  };
+}
+
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Mock user data
@@ -60,32 +73,35 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const mapCognitoUserToAppUser = (cognitoUser: any, userAttributes: any): User => {
+  const mapCognitoUserToAppUser = (cognitoUser: any, userAttributes: any, session: Session | null = null): User => {
     // Map cognito data to the user structure
-
+    const group = session?.tokens?.accessToken?.payload['cognito:groups']?.[0];
+    console.log("user group: ", group)
+    
     const tempObj = {
       id: cognitoUser.username,
       username: cognitoUser.username,
       email: cognitoUser.signInDetails?.loginId || '',
-      role: (cognitoUser.attributes?.['custom:role'] as UserRole) || 'admin',
+      role: ( group as UserRole) || 'admin',
       cognitoId: cognitoUser.userId,
       name: userAttributes.given_name || "",
       family_name: userAttributes.family_name || ""
     }
 
-    //console.log("cognitoUser returned: ", tempObj)
+    console.log("cognitoUser returned: ", tempObj)
 
     return tempObj
   };
 
   const loadUser = async () => {
     setIsLoading(true);
+    console.log("load user")
     try {
       const {cognitoUser, userAttributes} = await authService.getCurrentUser();
       const session = await authService.getSession();
 
       if (cognitoUser && session?.tokens?.idToken) {
-        const appUser = mapCognitoUserToAppUser(cognitoUser, userAttributes);
+        const appUser = mapCognitoUserToAppUser(cognitoUser, userAttributes, session);
         setUser(appUser);
         setToken(session.tokens.idToken.toString());
         setIsAuthenticated(true);

@@ -137,7 +137,7 @@ const Login = () => {
           const idToken = session.tokens?.idToken;
           const userAttributes = await fetchUserAttributes();
           const groups = session.tokens.accessToken.payload['cognito:groups'] || [];
-          console.log('User groups:', groups);
+          //console.log('User groups:', groups);
 
           if (!idToken) {
             throw new Error('No ID token found in session');
@@ -149,12 +149,12 @@ const Login = () => {
           if (state) {
             try {
               const parsedState = JSON.parse(decodeURIComponent(state));
-              navigate(parsedState.returnUrl || '/adminpanel/dashboard');
+              navigate(parsedState.returnUrl || '/adminpanel');
             } catch {
               navigate('/adminpanel/login');
             }
           } else {
-            navigate('/adminpanel/dashboard'); // Default redirect after successful login
+            navigate('/adminpanel'); // Default redirect after successful login
           }
         }
       } catch (error) {

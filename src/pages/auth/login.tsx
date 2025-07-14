@@ -28,7 +28,7 @@ const Login = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // For demo purposes, just navigate to the main app
-    navigate('/');
+    navigate('/adminpanel/dashboard');
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -135,23 +135,24 @@ const Login = () => {
         if (user) {
           const session = await fetchAuthSession();
           const idToken = session.tokens?.idToken;
+          const userAttributes = await fetchUserAttributes();
 
           if (!idToken) {
             throw new Error('No ID token found in session');
           }
 
-          await login(user, idToken.toString());
+          await login(user, idToken.toString(), userAttributes);
 
           const state = urlParams.get('state');
           if (state) {
             try {
               const parsedState = JSON.parse(decodeURIComponent(state));
-              navigate(parsedState.returnUrl || '/adminpanel/users');
+              navigate(parsedState.returnUrl || '/adminpanel/dashboard');
             } catch {
               navigate('/adminpanel/login');
             }
           } else {
-            navigate('/adminpanel/users'); // Default redirect after successful login
+            navigate('/adminpanel/dashboard'); // Default redirect after successful login
           }
         }
       } catch (error) {

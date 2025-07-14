@@ -95,7 +95,7 @@ const Index = () => {
               <h1 className="text-2xl font-bold text-navy-500">Dashboard</h1>
               <p className="text-gray-600">
                 Welcome to CasinoVizion Admin Panel
-                {user && <span className="ml-2 text-navy-500">- {user.username}</span>}
+                {user && <span className="ml-2 text-navy-500">- {user.name} {user.family_name}</span>}
               </p>
             </div>
           </div>
@@ -103,7 +103,7 @@ const Index = () => {
             {user && (
               <div className="text-right">
                 <p className="text-sm text-gray-600">Welcome back,</p>
-                <p className="font-medium text-navy-600">{user.username}</p>
+                <p className="font-medium text-navy-600">{user.name} {user.family_name}</p>
               </div>
             )}
             <ProfileDropdown />

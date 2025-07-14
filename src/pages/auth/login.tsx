@@ -55,13 +55,13 @@ const Login = () => {
         const currentUser = await getCurrentUser();
         const session = await fetchAuthSession();
         const idToken = session.tokens?.idToken;
-        console.log("currentUser: ", currentUser)
-        console.log("session: ", session)
+        //console.log("currentUser: ", currentUser)
+        //console.log("session: ", session)
 
         const userAttributes = await fetchUserAttributes();
         if (userAttributes) {
           const name = userAttributes.name; // Or userAttributes.given_name, userAttributes.family_name
-          console.log("User's name:", name);
+          console.log("userAttributes: ", userAttributes);
         }
 
         if (!idToken) {

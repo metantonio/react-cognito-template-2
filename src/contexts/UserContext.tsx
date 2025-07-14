@@ -61,13 +61,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const mapCognitoUserToAppUser = (cognitoUser: any): User => {
     // Map cognito data to the user structure
+    console.log("cognitoUser: ",cognitoUser)
     return {
       id: cognitoUser.username,
       username: cognitoUser.username,
       email: cognitoUser.signInDetails?.loginId || '',
       role: (cognitoUser.attributes?.['custom:role'] as UserRole) || 'admin',
       cognitoId: cognitoUser.userId,
-      userAttributes: cognitoUser.attributes
+      userAttributes: cognitoUser.userAttributes
     };
   };
   

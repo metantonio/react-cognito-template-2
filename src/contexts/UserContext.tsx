@@ -12,6 +12,8 @@ export interface User {
   avatar?: string;
   cognitoId?: string;
   userAttributes?: Record<string, string>;
+  name: string;
+  given_name: string;
 }
 
 interface UserContextType {
@@ -90,6 +92,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (cognitoUser: any, authToken: string) => {
     const appUser = mapCognitoUserToAppUser(cognitoUser);
+    console.log(AppUser)
     setUser(appUser);
     setToken(authToken);
     setIsAuthenticated(true);

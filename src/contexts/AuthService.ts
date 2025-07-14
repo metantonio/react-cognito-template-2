@@ -1,4 +1,4 @@
-import { getCurrentUser, signOut, fetchAuthSession } from '@aws-amplify/auth';
+import { getCurrentUser, signOut, fetchAuthSession, fetchUserAttributes } from '@aws-amplify/auth';
 
 export const authService = {
   async getCurrentUser() {
@@ -8,6 +8,15 @@ export const authService = {
       console.error('Error getting current user:', error);
       return null;
     }
+  },
+
+  async getAttributes(){
+        try {
+            return await fetchUserAttributes();
+          } catch (error) {
+            console.error('Error getting current user attributes:', error);
+            return null;
+          }
   },
 
   async getSession() {

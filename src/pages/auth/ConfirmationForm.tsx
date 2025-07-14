@@ -59,7 +59,7 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({ email, error, succe
           <Button variant="link" onClick={handleResendCode} disabled={isLoading}>
             Didn't receive the code? Resend
           </Button>
-          <Link to="/login" className="text-sm text-gray-600 hover:underline">
+          <Link to="/adminpanel/login" className="text-sm text-gray-600 hover:underline">
             Back to Login
           </Link>
         </CardFooter>

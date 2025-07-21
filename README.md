@@ -24,6 +24,8 @@ cd <YOUR_PROJECT_NAME>
 npm i
 npm add --save-dev @aws-amplify/backend@latest @aws-amplify/backend-cli@latest typescript
 npm install --save-dev cross-env
+npm install primereact
+npm i primeicons
 
 #Step 4: Navigate to the src folder, and create the .env file from the .env.example:
 ```bash

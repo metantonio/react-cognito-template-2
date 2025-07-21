@@ -8,6 +8,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { signIn, getCurrentUser, fetchAuthSession, fetchUserAttributes } from "aws-amplify/auth";
 import { AuthNextSignInStep, AuthSignInResult } from 'aws-amplify/auth';
+import GoogleSignInButton from './GoogleSignInButton';
+import FacebookSignInButton from './FacebookSignInButton';
+import AppleSignInButton from './AppleSignInButton';
 
 type FormState = {
   username: string;
@@ -250,6 +253,21 @@ const Login = () => {
                   <a href="#" className="text-sm text-navy-600 hover:underline">
                     Forgot password?
                   </a>
+                </div>
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-muted-foreground">
+                      Or continue with
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <GoogleSignInButton setIsLoading={setIsLoading} setError={setError} isLoading={isLoading} />
+                  <FacebookSignInButton setIsLoading={setIsLoading} setError={setError} isLoading={isLoading} />
+                  <AppleSignInButton setIsLoading={setIsLoading} setError={setError} isLoading={isLoading} />
                 </div>
 
                 <Button type="submit" className="w-full bg-navy-600 hover:bg-navy-700">

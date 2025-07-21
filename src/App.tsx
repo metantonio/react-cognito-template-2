@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SidebarProvider,SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { UserProvider } from "@/contexts/UserContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Login from "./pages/auth/login";
@@ -28,15 +28,15 @@ import CasinoSections from "./pages/casinos/CasinoSections";
 
 const queryClient = new QueryClient();
 
-const REACT_APP_COGNITO_USER_POOL_ID=import.meta.env.VITE_APP_COGNITO_USER_POOL_ID
-const REACT_APP_COGNITO_CLIENT_ID=import.meta.env.VITE_APP_COGNITO_CLIENT_ID
-const REACT_APP_COGNITO_DOMAIN=import.meta.env.VITE_APP_COGNITO_DOMAIN
+const REACT_APP_COGNITO_USER_POOL_ID = import.meta.env.VITE_APP_COGNITO_USER_POOL_ID
+const REACT_APP_COGNITO_CLIENT_ID = import.meta.env.VITE_APP_COGNITO_CLIENT_ID
+const REACT_APP_COGNITO_DOMAIN = import.meta.env.VITE_APP_COGNITO_DOMAIN
 
 
 const AppContent = () => {
   const location = useLocation();
   const isAuthRoute = location.pathname === "/adminpanel/login";
-  
+
   const Layout = isAuthRoute ? AuthLayout : DashboardLayout;
   const amplifyConfig: ResourcesConfig = {
     Auth: {
@@ -63,21 +63,46 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Navigate to="/adminpanel/login" replace />} />
         <Route path="/adminpanel/login" element={<Login />} />
-        <Route path="/adminpanel" element={<Index />} />
-        <Route path="/adminpanel/casinos" element={<CasinoList />} />
-        <Route path="/adminpanel/casinos/create" element={<CreateCasino />} />
-        <Route path="/adminpanel/casinos/:casinoId" element={<CasinoDetails />} />
-        <Route path="/adminpanel/casinos/:casinoId/view" element={<ViewCasino />} />
-        <Route 
-          path="/adminpanel/users" 
+        <Route path="/adminpanel" element={
+          <ProtectedRoute permission="add_edit_delete_dashboard">
+            <Index />
+          </ProtectedRoute>} />
+        <Route path="/adminpanel/casinos" element={
+          <ProtectedRoute permission="add_edit_delete_casinolist">
+            <CasinoList />
+          </ProtectedRoute>
+        } />
+        <Route path="/adminpanel/casinos/create" element={
+          <ProtectedRoute permission="add_edit_delete_create_casino">
+            <CreateCasino />
+          </ProtectedRoute>
+        } />
+        <Route path="/adminpanel/casinos/:casinoId" element={
+          <ProtectedRoute permission="add_edit_delete_create_casino">
+            <CasinoDetails />
+          </ProtectedRoute>} />
+        <Route path="/adminpanel/casinos/:casinoId/view" element={
+          <ProtectedRoute permission="add_edit_delete_create_casino">
+            <ViewCasino />
+          </ProtectedRoute>} />
+        <Route
+          path="/adminpanel/users"
           element={
             <ProtectedRoute permission="add_edit_delete_users">
               <Users />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route path="/adminpanel/analytics" element={<Analytics />} />
-        <Route path="/adminpanel/settings" element={<Settings />} />
+        <Route path="/adminpanel/analytics" element={
+          <ProtectedRoute permission="add_edit_delete_analytics">
+            <Analytics />
+          </ProtectedRoute>} />
+        <Route path="/adminpanel/settings" element={
+          <ProtectedRoute permission="add_edit_delete_settings">
+            <Settings />
+          </ProtectedRoute>
+
+        } />
         {/* <Route path="/adminpanel/login/signup" element={<Signup />} /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>

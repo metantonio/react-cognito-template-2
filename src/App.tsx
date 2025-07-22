@@ -64,25 +64,25 @@ const AppContent = () => {
         <Route path="/" element={<Navigate to="/adminpanel/login" replace />} />
         <Route path="/adminpanel/login" element={<Login />} />
         <Route path="/adminpanel" element={
-          <ProtectedRoute permission="add_edit_delete_dashboard">
+          <ProtectedRoute permission="view_all">
             <Index />
           </ProtectedRoute>} />
         <Route path="/adminpanel/casinos" element={
-          <ProtectedRoute permission="add_edit_delete_casinolist">
+          <ProtectedRoute permission="view_all">
             <CasinoList />
           </ProtectedRoute>
         } />
         <Route path="/adminpanel/casinos/create" element={
-          <ProtectedRoute permission="add_edit_delete_create_casino">
+          <ProtectedRoute permission="view_all">
             <CreateCasino />
           </ProtectedRoute>
         } />
         <Route path="/adminpanel/casinos/:casinoId" element={
-          <ProtectedRoute permission="add_edit_delete_create_casino">
+          <ProtectedRoute permission="view_all">
             <CasinoDetails />
           </ProtectedRoute>} />
         <Route path="/adminpanel/casinos/:casinoId/view" element={
-          <ProtectedRoute permission="add_edit_delete_create_casino">
+          <ProtectedRoute permission="view_all">
             <ViewCasino />
           </ProtectedRoute>} />
         <Route
@@ -94,11 +94,11 @@ const AppContent = () => {
           }
         />
         <Route path="/adminpanel/analytics" element={
-          <ProtectedRoute permission="add_edit_delete_analytics">
+          <ProtectedRoute permission="view_all">
             <Analytics />
           </ProtectedRoute>} />
         <Route path="/adminpanel/settings" element={
-          <ProtectedRoute permission="add_edit_delete_settings">
+          <ProtectedRoute permission="edit_profile">
             <Settings />
           </ProtectedRoute>
 

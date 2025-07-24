@@ -28,9 +28,7 @@ const SignUpStep = {
 
 interface IForm {
   username: string;
-  password: string;
   email: string;
-  confirmPassword: string;
   address: string;
   phone: string;
   website: string;
@@ -43,9 +41,7 @@ interface IForm {
 const Signup = () => {
   const [form, setForm] = useState<IForm>({
     username: "",
-    password: "",
     email: "",
-    confirmPassword: "",
     address: "",
     phone: "",
     website: "",
@@ -80,15 +76,6 @@ const Signup = () => {
     if (!form.email.trim()) {
       throw new Error("Email is required");
     }
-    if (!form.password.trim()) {
-      throw new Error("Password is required");
-    }
-    if (form.password !== form.confirmPassword) {
-      throw new Error("Passwords do not match");
-    }
-    if (form.password.length < 8) {
-      throw new Error("Password must be at least 8 characters long");
-    }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) {
@@ -114,7 +101,6 @@ const Signup = () => {
 
       const { isSignUpComplete, nextStep }: SignUpResult = await signUp({
         username: form.username,
-        password: form.password,
         options: {
           userAttributes: {
             email: form.email,
@@ -202,7 +188,8 @@ const Signup = () => {
       } else {
         setError("An unknown error occurred while resending the code.");
       }
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };
@@ -264,32 +251,6 @@ const Signup = () => {
                 value={form.email}
                 onChange={handleChange}
                 placeholder="john.doe@example.com"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={form.password}
-                onChange={handleChange}
-                placeholder="********"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                value={form.confirmPassword}
-                onChange={handleChange}
-                placeholder="********"
                 required
                 disabled={isLoading}
               />

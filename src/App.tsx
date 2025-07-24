@@ -19,7 +19,7 @@ import NotFound from "./pages/NotFound";
 import { AuthProvider } from './contexts/AuthContext';
 import { Amplify } from 'aws-amplify';
 import { ResourcesConfig } from 'aws-amplify/utils';
-//import Signup from "./pages/auth/signup";
+import Signup from "./pages/auth/signup";
 
 // Layouts
 import AuthLayout from "./components/LoginLayout";
@@ -103,7 +103,7 @@ const AppContent = () => {
           </ProtectedRoute>
 
         } />
-        {/* <Route path="/adminpanel/login/signup" element={<Signup />} /> */}
+        <Route path="/adminpanel/login/signup" element={<Signup />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>

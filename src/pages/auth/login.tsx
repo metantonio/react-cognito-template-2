@@ -3,11 +3,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
-import { useNavigate, Link } from 'react-router-dom';
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { signIn, getCurrentUser, fetchAuthSession, fetchUserAttributes } from "aws-amplify/auth";
 import { AuthNextSignInStep, AuthSignInResult } from 'aws-amplify/auth';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type FormState = {
   username: string;
@@ -15,7 +25,7 @@ type FormState = {
 };
 
 const Login = () => {
-  const { login, logout } = useUser();
+  const { login } = useUser();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,13 +33,8 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [enableRedirect, setEnableRedirect] = useState<boolean>(false);
+  const [showSignUpDialog, setShowSignUpDialog] = useState(false);
   const navigate = useNavigate();
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // For demo purposes, just navigate to the main app
-    navigate('/adminpanel');
-  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -55,14 +60,7 @@ const Login = () => {
         const currentUser = await getCurrentUser();
         const session = await fetchAuthSession();
         const idToken = session.tokens?.idToken;
-        //console.log("currentUser: ", currentUser)
-        //console.log("session: ", session)
-
         const userAttributes = await fetchUserAttributes();
-        if (userAttributes) {
-          const name = userAttributes.given_name || ""; // Or userAttributes.given_name, userAttributes.family_name
-          console.log("userAttributes: ", userAttributes);
-        }
 
         if (!idToken) {
           throw new Error('No ID token found in session');
@@ -70,26 +68,22 @@ const Login = () => {
 
         await login(currentUser, idToken.toString(), userAttributes);
 
-        const redirectUrl = idToken.payload.website || currentUser.signInDetails?.loginId || '';
+        const redirectUrl = idToken.payload.website as string || currentUser.signInDetails?.loginId || '';
 
         if (redirectUrl && enableRedirect) {
           let absoluteUrl = `${redirectUrl}/?code=${idToken.payload.jti}`;
           if (redirectUrl.includes('.') && !redirectUrl.includes('://')) {
             absoluteUrl = `https://${redirectUrl}/?code=${idToken.payload.jti}`;
           }
-
-          if (isValidUrl(absoluteUrl)) {
-            window.location.href = absoluteUrl;
-          } else {
-            navigate('/adminpanel');
-          }
         }
       } else {
         handleAuthNextStep(nextStep);
       }
-    } catch (err: unknown) {
+    } catch (err: any) {
       console.error('Login error:', err);
-      if (err instanceof Error) {
+      if (err.name === 'UserNotFoundException' || err.name === 'NotAuthorizedException') {
+        setShowSignUpDialog(true);
+      } else if (err instanceof Error) {
         setError(err.message || 'Login failed. Please check your credentials.');
       } else {
         setError('An unknown error occurred during login.');
@@ -125,7 +119,6 @@ const Login = () => {
         if (errorParam || errorDescriptionParam) {
           setError(`Social sign-in failed: ${errorDescriptionParam || errorParam}. Please check your browser's pop-up blocker or try again later.`);
           setIsLoading(false);
-          // Clear the error parameters from the URL to prevent re-triggering
           const newUrl = window.location.origin + window.location.pathname;
           window.history.replaceState({}, document.title, newUrl);
           return;
@@ -136,8 +129,6 @@ const Login = () => {
           const session = await fetchAuthSession();
           const idToken = session.tokens?.idToken;
           const userAttributes = await fetchUserAttributes();
-          const groups = session.tokens.accessToken.payload['cognito:groups'] || [];
-          //console.log('User groups:', groups);
 
           if (!idToken) {
             throw new Error('No ID token found in session');
@@ -154,13 +145,11 @@ const Login = () => {
               navigate('/adminpanel/login');
             }
           } else {
-            navigate('/adminpanel'); // Default redirect after successful login
+            navigate('/adminpanel');
           }
         }
       } catch (error) {
         console.log('No authenticated user found or OAuth response error:', error);
-        // This catch block is for initial load, not necessarily a failed login attempt
-        // If it's a real error, it should be caught by the errorParam check above
       }
     };
 
@@ -191,6 +180,20 @@ const Login = () => {
                   {error}
                 </div>
               )}
+              <AlertDialog open={showSignUpDialog} onOpenChange={setShowSignUpDialog}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Account not found</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      The email or password you entered is incorrect. Would you like to create a new account?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => navigate('/adminpanel/login/signup')}>Sign Up</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>

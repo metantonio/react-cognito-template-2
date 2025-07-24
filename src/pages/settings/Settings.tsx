@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Save, Upload } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { updatePassword } from 'aws-amplify/auth';
 
 const Settings = () => {
   const [searchParams] = useSearchParams();
@@ -52,6 +53,25 @@ const handlePasswordChange = (field: string, value: string) => {
     setError(newPassword && confirmPassword && newPassword !== confirmPassword ? "Passwords do not match." : "");
   }
 };
+
+const handleUpdatePassword = async () => {
+  if (passwords.new !== passwords.confirm) {
+    setError("Passwords do not match.");
+    return;
+  }
+  try {
+    await updatePassword({ oldPassword: passwords.old, newPassword: passwords.new });
+    toast({
+      title: "Password Updated",
+      description: "Your password has been changed successfully.",
+    });
+    setPasswords({ old: "", new: "", confirm: "" });
+  } catch (err) {
+    setError("Failed to update password. Please check your old password and try again.");
+    console.error("Password update error:", err);
+  }
+};
+
   const handleSave = () => {
     toast({
       title: "Success",
@@ -213,13 +233,7 @@ const handlePasswordChange = (field: string, value: string) => {
                       {error && <p className="text-sm text-red-600">{error}</p>}
 
                       <Button
-                        onClick={() => {
-                          // handle API call or save logic here
-                          toast({
-                            title: "Password Updated",
-                            description: "Your password has been changed successfully.",
-                          });
-                        }}
+                        onClick={handleUpdatePassword}
                         disabled={
                           !passwords.old || !passwords.new || !passwords.confirm || error !== ""
                         }

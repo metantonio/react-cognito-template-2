@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CategorySubcategoryDropdowns from '@/components/CategorySubcategoryDropdowns';
@@ -13,9 +12,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000/api/";
 
+interface FormData {
+  name: string;
+  description: string;
+  address: string;
+  address2: string;
+  address3: string;
+  email: string;
+  image: string;
+  latitude: number;
+  longitude: number;
+  category: string;
+  subcategories: string[];
+  status: string;
+}
+
 const CreateCasino = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     description: "",
     address: "",
@@ -31,7 +45,7 @@ const CreateCasino = () => {
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  const handleInput = (field: string, value: any) => {
+  const handleInput = (field: keyof FormData, value: string | string[] | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

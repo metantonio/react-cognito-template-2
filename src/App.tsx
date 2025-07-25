@@ -35,7 +35,7 @@ const REACT_APP_COGNITO_DOMAIN = import.meta.env.VITE_APP_COGNITO_DOMAIN
 
 const AppContent = () => {
   const location = useLocation();
-  const isAuthRoute = location.pathname === "/adminpanel/login";
+  const isAuthRoute = location.pathname.startsWith("/adminpanel/login");
 
   const Layout = isAuthRoute ? AuthLayout : DashboardLayout;
   const amplifyConfig: ResourcesConfig = {

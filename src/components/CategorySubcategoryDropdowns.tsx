@@ -4,10 +4,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { getCategories, listSubcategoriesByCategoryId } from '@/services/categories';
-import { MultiSelect } from 'primereact/multiselect';
+import { MultiSelect, MultiSelectChangeEvent } from 'primereact/multiselect';
 import 'primereact/resources/themes/lara-light-cyan/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
+
+interface ApiSelectOption {
+  key: string | number;
+  value: string;
+}
 
 interface Category {
   name: string;
@@ -43,7 +48,7 @@ const CategorySubcategoryDropdowns: React.FC<CategorySubcategoryDropdownsProps> 
     const loadCategories = async () => {
       try {
         const data = await getCategories();
-        const transformed = data.map((cat: any) => ({
+        const transformed = data.map((cat: ApiSelectOption) => ({
           name: cat.value,
           code: String(cat.key),
         }));
@@ -78,7 +83,7 @@ const CategorySubcategoryDropdowns: React.FC<CategorySubcategoryDropdownsProps> 
         }
 
         const data = await listSubcategoriesByCategoryId(category.code);
-        const transformed = data.map((subcat: any) => ({
+        const transformed = data.map((subcat: ApiSelectOption) => ({
           name: subcat.value,
           code: String(subcat.key),
         }));
@@ -104,7 +109,7 @@ const CategorySubcategoryDropdowns: React.FC<CategorySubcategoryDropdownsProps> 
     };
 
     loadSubcategories();
-  }, [selectedCategory, categories]);
+  }, [selectedCategory, categories, onSubcategoriesChange, selectedSubcategories]);
 
   const handleCategoryChange = (value: string) => {
     console.log("Category changed to:", value);
@@ -112,7 +117,7 @@ const CategorySubcategoryDropdowns: React.FC<CategorySubcategoryDropdownsProps> 
     onSubcategoriesChange([]);
   };
 
-  const handleSubcategoryChange = (e: any) => {
+  const handleSubcategoryChange = (e: MultiSelectChangeEvent) => {
     const selectedCodes = e.value || [];
     console.log("Subcategories changed to:", selectedCodes);
     onSubcategoriesChange(selectedCodes);

@@ -1,6 +1,6 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { authService } from './AuthService';
+import { AuthUser, FetchUserAttributesOutput } from 'aws-amplify/auth';
 
 export type UserRole = 'admin' | 'developer' | 'guest';
 
@@ -22,7 +22,7 @@ interface UserContextType {
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (userData: User, token: string) => void;
+  login: (cognitoUser: AuthUser, token: string, userAttributes: FetchUserAttributesOutput) => void;
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
   hasPermission: (permission: string) => boolean;
@@ -39,6 +39,9 @@ interface Session {
     };
     idToken?: {
       toString(): string;
+      payload: {
+        exp: number;
+      };
     };
   };
 }
@@ -51,19 +54,28 @@ const mockUsers: { [key in UserRole]: User } = {
     id: '1',
     username: 'Admin User',
     email: 'admin@casinovizion.com',
-    role: 'admin'
+    role: 'admin',
+    name: 'Admin',
+    given_name: 'Admin',
+    family_name: 'User'
   },
   developer: {
     id: '2',
     username: 'Dev User',
     email: 'developer@casinovizion.com',
-    role: 'developer'
+    role: 'developer',
+    name: 'Dev',
+    given_name: 'Dev',
+    family_name: 'User'
   },
   guest: {
     id: '3',
     username: 'Guest User',
     email: 'guest@casinovizion.com',
-    role: 'guest'
+    role: 'guest',
+    name: 'Guest',
+    given_name: 'Guest',
+    family_name: 'User'
   }
 };
 
@@ -73,18 +85,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const mapCognitoUserToAppUser = (cognitoUser: any, userAttributes: any, session: Session | null = null): User => {
+  const mapCognitoUserToAppUser = (cognitoUser: AuthUser, userAttributes: FetchUserAttributesOutput, session: Session | null = null): User => {
     // Map cognito data to the user structure
     const group = session?.tokens?.accessToken?.payload['cognito:groups']?.[0];
     console.log("user group: ", group)
     
-    const tempObj = {
+    const tempObj: User = {
       id: cognitoUser.username,
       username: cognitoUser.username,
       email: cognitoUser.signInDetails?.loginId || '',
       role: ( group as UserRole) || 'admin',
       cognitoId: cognitoUser.userId,
       name: userAttributes.given_name || "",
+      given_name: userAttributes.given_name || "",
       family_name: userAttributes.family_name || ""
     }
 
@@ -113,7 +126,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const login = async (cognitoUser: any, authToken: string, userAttributes: any) => {
+  const login = async (cognitoUser: AuthUser, authToken: string, userAttributes: FetchUserAttributesOutput) => {
     
     const appUser = mapCognitoUserToAppUser(cognitoUser, userAttributes);
     //console.log(appUser)

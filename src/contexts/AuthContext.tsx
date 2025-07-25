@@ -1,12 +1,10 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { getCurrentUser, signOut, fetchAuthSession } from '@aws-amplify/auth';
+import { AuthUser, FetchUserAttributesOutput } from 'aws-amplify/auth';
 
 // Define los tipos para el usuario y el contexto
-interface User {
-  username?: string;
-  userId?: string;
-  userAttributes?: Record<string, string>;
-  [key: string]: any;
+interface User extends AuthUser {
+  userAttributes?: FetchUserAttributesOutput;
 }
 
 interface AuthContextType {
@@ -15,13 +13,13 @@ interface AuthContextType {
   isLoading: boolean;
   shown: boolean;
   isAuthenticated: boolean;
-  login: (idTokenOrString: any) => Promise<boolean>;
+  login: (user: AuthUser, token: string, attributes: FetchUserAttributesOutput) => Promise<boolean>;
   logout: () => Promise<boolean>;
   validateToken: () => Promise<boolean>;
   refreshToken: () => Promise<string | null>;
   checkAuthState: () => Promise<void>;
   checkAuthentication: () => Promise<void>;
-  userAttributes: Record<string, string>;
+  userAttributes: FetchUserAttributesOutput;
 }
 
 interface AuthProviderProps {
@@ -114,7 +112,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const idToken = session.tokens.idToken;
         const currentTime = Math.floor(Date.now() / 1000);
         
-        if (idToken.payload.exp > currentTime) {
+        if (idToken.payload.exp && idToken.payload.exp > currentTime) {
           return true;
         }
       }
@@ -130,21 +128,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = async (idTokenOrString: any): Promise<boolean> => {
+  const login = async (user: AuthUser, token: string, attributes: FetchUserAttributesOutput): Promise<boolean> => {
     try {
-      // Handle both token object and token string
-      const tokenString = typeof idTokenOrString === 'string' 
-        ? idTokenOrString 
-        : idTokenOrString?.toString();
-      
-      setToken(tokenString);
-      
-      // Get user details
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
+      setUser({ ...user, userAttributes: attributes });
+      setToken(token);
       setShown(true);
       setIsAuthenticated(true);
-      
       return true;
     } catch (error) {
       console.error('Login failed:', error);

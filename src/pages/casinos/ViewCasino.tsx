@@ -8,9 +8,51 @@ import { Plus, Edit, Trash2, ArrowLeft } from "lucide-react";
 
 import { getCasinos } from '../../services/casinos';
 
+interface Casino {
+  casino_id: string | number;
+  casino_name: string;
+  category: string;
+  subcategories: string[];
+  image: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  created_at: string;
+  Contact?: string;
+  email?: string;
+  phone?: string;
+  status?: string;
+  description?: string;
+  timings?: string;
+  restaurants?: Restaurant[];
+  promotions?: Promotion[];
+  hotels?: Hotel[];
+}
+
+interface Restaurant {
+  id: string | number;
+  name: string;
+  cuisine: string;
+  rating: number;
+}
+
+interface Promotion {
+  id: string | number;
+  title: string;
+  description: string;
+  status: string;
+}
+
+interface Hotel {
+  id: string | number;
+  name: string;
+  rooms: number;
+  rating: number;
+}
+
 function CasinoSections() {
   const { casinoId } = useParams();
-  const [casinoData, setCasinoData] = useState<any>(null);
+  const [casinoData, setCasinoData] = useState<Casino | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>("");
   const restaurantsRef = useRef<HTMLDivElement>(null);
@@ -18,29 +60,29 @@ function CasinoSections() {
   const hotelsRef = useRef<HTMLDivElement>(null);
 
   // Optionally, fetch these from backend if available
-  const [restaurants, setRestaurants] = useState<any[]>([]);
-  const [promotions, setPromotions] = useState<any[]>([]);
-  const [hotels, setHotels] = useState<any[]>([]);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [hotels, setHotels] = useState<Hotel[]>([]);
 
   useEffect(() => {
     async function fetchCasino() {
       setLoading(true);
       try {
         const res = await getCasinos();
-        const found = (res.data || []).find((casino: any) => String(casino.casino_id) === String(casinoId));
+        const found = (res.data || []).find((casino: Casino) => String(casino.casino_id) === String(casinoId));
         console.log("Found Casino:", found);
         if (found) {
           setCasinoData({
-            id: found.casino_id,
-            name: found.casino_name,
+            casino_id: found.casino_id,
+            casino_name: found.casino_name,
             category: found.category,
             subcategories: found.subcategories,
             image: `http://localhost:5000/${found.image.replace(/\\/g, '/')}`,
             address: found.address,
             latitude: found.latitude,
             longitude: found.longitude,
-            createdAt: found.created_at,
-            contact: found.Contact || '',
+            created_at: found.created_at,
+            Contact: found.Contact || '',
             email: found.email || '',
             phone: found.phone || '',
             status: found.status || 'Active',
@@ -97,10 +139,10 @@ function CasinoSections() {
           {/* Casino image and name */}
           <img
             src={casinoData.image}
-            alt={casinoData.name}
+            alt={casinoData.casino_name}
             className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm mr-0"
           />
-          <span className="text-2xl font-bold text-navy-500 mr-2">{casinoData.name}</span>
+          <span className="text-2xl font-bold text-navy-500 mr-2">{casinoData.casino_name}</span>
           <Button
             variant={activeTab === "restaurants" ? "default" : "outline"}
             className="rounded-full px-4 py-1 text-sm"
@@ -161,7 +203,7 @@ function CasinoSections() {
                 </div>
                 <div className="flex items-center gap-2">
                   <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 4h16v16H4z" /></svg>
-                  <span className="text-gray-600">{casinoData.contact}</span>
+                  <span className="text-gray-600">{casinoData.Contact}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92V19a2 2 0 0 1-2.18 2A19.72 19.72 0 0 1 3 5.18 2 2 0 0 1 5 3h2.09a2 2 0 0 1 2 1.72c.13.81.36 1.6.68 2.34a2 2 0 0 1-.45 2.11l-.27.27a16 16 0 0 0 6.29 6.29l.27-.27a2 2 0 0 1 2.11-.45c.74.32 1.53.55 2.34.68A2 2 0 0 1 21 16.91z" /></svg>
@@ -234,7 +276,7 @@ function CasinoSections() {
                   <TableBody>
                     {restaurants.length === 0 ? (
                       <TableRow><TableCell colSpan={4} className="text-center">No restaurants found.</TableCell></TableRow>
-                    ) : restaurants.map((restaurant: any) => (
+                    ) : restaurants.map((restaurant: Restaurant) => (
                       <TableRow key={restaurant.id}>
                         <TableCell className="font-medium">{restaurant.name}</TableCell>
                         <TableCell>{restaurant.cuisine}</TableCell>
@@ -287,7 +329,7 @@ function CasinoSections() {
                   <TableBody>
                     {promotions.length === 0 ? (
                       <TableRow><TableCell colSpan={4} className="text-center">No promotions found.</TableCell></TableRow>
-                    ) : promotions.map((promotion: any) => (
+                    ) : promotions.map((promotion: Promotion) => (
                       <TableRow key={promotion.id}>
                         <TableCell className="font-medium">{promotion.title}</TableCell>
                         <TableCell>{promotion.description}</TableCell>
@@ -343,7 +385,7 @@ function CasinoSections() {
                   <TableBody>
                     {hotels.length === 0 ? (
                       <TableRow><TableCell colSpan={4} className="text-center">No hotels found.</TableCell></TableRow>
-                    ) : hotels.map((hotel: any) => (
+                    ) : hotels.map((hotel: Hotel) => (
                       <TableRow key={hotel.id}>
                         <TableCell className="font-medium">{hotel.name}</TableCell>
                         <TableCell>{hotel.rooms} rooms</TableCell>

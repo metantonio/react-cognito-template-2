@@ -36,51 +36,9 @@ const Login = () => {
   const [showSignUpDialog, setShowSignUpDialog] = useState(false);
   const navigate = useNavigate();
 
-  const [newPasswordRequired, setNewPasswordRequired] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     if (error) setError('');
-  };
-
-  const handleNewPasswordSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match.');
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const { isSignedIn } = await confirmSignIn({ challengeResponse: newPassword });
-
-      if (isSignedIn) {
-        const currentUser = await getCurrentUser();
-        const session = await fetchAuthSession();
-        const idToken = session.tokens?.idToken;
-        const userAttributes = await fetchUserAttributes();
-
-        if (!idToken) {
-          throw new Error('No ID token found in session');
-        }
-
-        await login(currentUser, idToken.toString(), userAttributes);
-        navigate('/adminpanel');
-      } else {
-        setError('Could not complete sign in. Please try again.');
-      }
-    } catch (err) {
-      const authError = err as AuthError;
-      console.error('New password submission error:', authError);
-      setError(authError.message || 'Failed to set new password.');
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -120,18 +78,15 @@ const Login = () => {
         }
         navigate('/adminpanel');
       } else {
-        if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
-          setNewPasswordRequired(true);
-          setPassword(''); // Clear temporary password from state
-        } else {
-          handleAuthNextStep(nextStep);
-        }
+        handleAuthNextStep(nextStep);
       }
     } catch (err) {
       const authError = err as AuthError;
       console.error('Login error:', authError);
       if (authError.name === 'UserNotFoundException' || authError.name === 'NotAuthorizedException') {
         setShowSignUpDialog(true);
+      } else if (authError.name === 'NewPasswordRequired') {
+        navigate('/updatepassword', { state: { email } });
       } else if (err instanceof Error) {
         setError(err.message || 'Login failed. Please check your credentials.');
       } else {
@@ -145,8 +100,7 @@ const Login = () => {
   const handleAuthNextStep = (nextStep: AuthNextSignInStep) => {
     switch (nextStep.signInStep) {
       case 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED':
-        setNewPasswordRequired(true);
-        setPassword('');
+        navigate('/updatepassword', { state: { email } });
         break;
       case 'CONFIRM_SIGN_IN_WITH_TOTP_CODE':
         setError('MFA code required. Please implement MFA flow.');
@@ -217,164 +171,100 @@ const Login = () => {
             <p className="text-gray-600 mt-2">Sign in to your CasinoVizion account</p>
           </div>
 
-          {!newPasswordRequired ? (
-            <Card className="border-gray-200 shadow-lg">
-              <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl text-center">Sign In</CardTitle>
-                <CardDescription className="text-center">
-                  Enter your credentials to access your account
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {error && (
-                  <div className="mb-4 text-red-500 bg-red-100 p-3 rounded">
-                    {error}
+          <Card className="border-gray-200 shadow-lg">
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl text-center">Sign In</CardTitle>
+              <CardDescription className="text-center">
+                Enter your credentials to access your account
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {error && (
+                <div className="mb-4 text-red-500 bg-red-100 p-3 rounded">
+                  {error}
+                </div>
+              )}
+              <AlertDialog open={showSignUpDialog} onOpenChange={setShowSignUpDialog}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Account not found</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      The email or password you entered is incorrect. {/* Would you like to create a new account? */}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    {/* <AlertDialogAction onClick={() => navigate('/adminpanel/login/signup')}>Sign Up</AlertDialogAction> */}
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      disabled={isLoading}
+                      required
+                    />
                   </div>
-                )}
-                <AlertDialog open={showSignUpDialog} onOpenChange={setShowSignUpDialog}>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Account not found</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        The email or password you entered is incorrect. Would you like to create a new account?
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => navigate('/adminpanel/login/signup')}>Sign Up</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
-                        disabled={isLoading}
-                        required
-                      />
-                    </div>
-                  </div>
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => {
-                          setPassword(e.target.value)
-                          handleChange(e)
-                        }}
-                        className="pl-10 pr-10"
-                        disabled={isLoading}
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value)
+                        handleChange(e)
+                      }}
+                      className="pl-10 pr-10"
+                      disabled={isLoading}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
                   </div>
+                </div>
 
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <input
-                        id="remember"
-                        type="checkbox"
-                        className="rounded border-gray-300"
-                      />
-                      <label htmlFor="remember" className="text-sm text-gray-600">
-                        Remember me
-                      </label>
-                    </div>
-                    <a href="#" className="text-sm text-navy-600 hover:underline">
-                      Forgot password?
-                    </a>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      id="remember"
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                    />
+                    <label htmlFor="remember" className="text-sm text-gray-600">
+                      Remember me
+                    </label>
                   </div>
+                  <a href="#" className="text-sm text-navy-600 hover:underline">
+                    Forgot password?
+                  </a>
+                </div>
 
-                  <Button type="submit" className="w-full bg-navy-600 hover:bg-navy-700">
-                    {isLoading ? 'Signing In...' : 'Sign In'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card className="border-gray-200 shadow-lg">
-              <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl text-center">Set New Password</CardTitle>
-                <CardDescription className="text-center">
-                  A new password is required. Please enter a new password below.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {error && (
-                  <div className="mb-4 text-red-500 bg-red-100 p-3 rounded">
-                    {error}
-                  </div>
-                )}
-                <form onSubmit={handleNewPasswordSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="newPassword">New Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="newPassword"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your new password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className="pl-10 pr-10"
-                        disabled={isLoading}
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="confirmPassword"
-                        type="password"
-                        placeholder="Confirm your new password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="pl-10"
-                        disabled={isLoading}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <Button type="submit" className="w-full bg-navy-600 hover:bg-navy-700">
-                    {isLoading ? 'Setting Password...' : 'Set New Password and Sign In'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          )}
+                <Button type="submit" className="w-full bg-navy-600 hover:bg-navy-700">
+                  {isLoading ? 'Signing In...' : 'Sign In'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
 

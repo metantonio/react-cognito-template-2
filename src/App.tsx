@@ -103,7 +103,7 @@ const AppContent = () => {
           </ProtectedRoute>
 
         } />
-        <Route path="/adminpanel/login/signup" element={<Signup />} />
+        {/* <Route path="/adminpanel/login/signup" element={<Signup />} /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>

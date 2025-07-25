@@ -68,3 +68,10 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+Requirements:8-character minimum length
+Contains at least 1 number
+Contains at least 1 lowercase letter
+Contains at least 1 uppercase letter
+Contains at least 1 special character from the following set, or a non-leading, non-trailing space character.
+^ $ * . [ ] { } ( ) ? - " ! @ # % & / \ , > < ' : ; | _ ~ ` + =

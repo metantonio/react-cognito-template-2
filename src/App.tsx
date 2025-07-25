@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { UserProvider } from "@/contexts/UserContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Login from "./pages/auth/login";
@@ -20,22 +20,21 @@ import { AuthProvider } from './contexts/AuthContext';
 import { Amplify } from 'aws-amplify';
 import { ResourcesConfig } from 'aws-amplify/utils';
 import Signup from "./pages/auth/signup";
+import UpdatePassword from "./pages/auth/UpdatePassword";
 
 // Layouts
 import AuthLayout from "./components/LoginLayout";
 import DashboardLayout from "./components/MainLayout";
-import CasinoSections from "./pages/casinos/CasinoSections";
 
 const queryClient = new QueryClient();
 
-const REACT_APP_COGNITO_USER_POOL_ID = import.meta.env.VITE_APP_COGNITO_USER_POOL_ID
-const REACT_APP_COGNITO_CLIENT_ID = import.meta.env.VITE_APP_COGNITO_CLIENT_ID
-const REACT_APP_COGNITO_DOMAIN = import.meta.env.VITE_APP_COGNITO_DOMAIN
-
+const REACT_APP_COGNITO_USER_POOL_ID = import.meta.env.VITE_APP_COGNITO_USER_POOL_ID;
+const REACT_APP_COGNITO_CLIENT_ID = import.meta.env.VITE_APP_COGNITO_CLIENT_ID;
+const REACT_APP_COGNITO_DOMAIN = import.meta.env.VITE_APP_COGNITO_DOMAIN;
 
 const AppContent = () => {
   const location = useLocation();
-  const isAuthRoute = location.pathname.startsWith("/adminpanel/login");
+  const isAuthRoute = location.pathname.startsWith("/adminpanel/login") || location.pathname === "/updatepassword";
 
   const Layout = isAuthRoute ? AuthLayout : DashboardLayout;
   const amplifyConfig: ResourcesConfig = {
@@ -63,6 +62,7 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Navigate to="/adminpanel/login" replace />} />
         <Route path="/adminpanel/login" element={<Login />} />
+        <Route path="/updatepassword" element={<UpdatePassword />} />
         <Route path="/adminpanel" element={
           <ProtectedRoute permission="view_all">
             <Index />

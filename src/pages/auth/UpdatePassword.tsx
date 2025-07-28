@@ -26,19 +26,24 @@ const UpdatePassword = () => {
     const errors: string[] = [];
     if (password.length < 8) {
       errors.push("Password must be at least 8 characters long.");
+      setError("Password must be at least 8 characters long.");
     }
     if (!/[0-9]/.test(password)) {
       errors.push("Password must contain at least 1 number.");
+      setError("Password must contain at least 1 number.");
     }
     if (!/[a-z]/.test(password)) {
       errors.push("Password must contain at least 1 lowercase letter.");
+      setError("Password must contain at least 1 lowercase letter.");
     }
     if (!/[A-Z]/.test(password)) {
       errors.push("Password must contain at least 1 uppercase letter.");
+      setError("Password must contain at least 1 uppercase letter.");
     }
     const specialCharPattern = /[^a-zA-Z0-9 ]/;
     if (!specialCharPattern.test(password)) {
       errors.push("Password must contain at least 1 special character or a space.");
+      setError("Password must contain at least 1 special character or a space.");
     }
     return errors;
   };

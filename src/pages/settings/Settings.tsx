@@ -38,39 +38,75 @@ const Settings = () => {
   };
 
   const [passwords, setPasswords] = useState({
-  old: "",
-  new: "",
-  confirm: "",
-});
-const [error, setError] = useState("");
+    old: "",
+    new: "",
+    confirm: "",
+  });
+  const [error, setError] = useState("");
 
-// Handler
-const handlePasswordChange = (field: string, value: string) => {
-  setPasswords((prev) => ({ ...prev, [field]: value }));
-  if (field === "new" || field === "confirm") {
-    const newPassword = field === "new" ? value : passwords.new;
-    const confirmPassword = field === "confirm" ? value : passwords.confirm;
-    setError(newPassword && confirmPassword && newPassword !== confirmPassword ? "Passwords do not match." : "");
-  }
-};
+  // Handler
+  const handlePasswordChange = (field: string, value: string) => {
+    setPasswords((prev) => ({ ...prev, [field]: value }));
+    if (field === "new" || field === "confirm") {
+      const newPassword = field === "new" ? value : passwords.new;
+      const confirmPassword = field === "confirm" ? value : passwords.confirm;
+      setError(newPassword && confirmPassword && newPassword !== confirmPassword ? "Passwords do not match." : "");
+    }
+  };
 
-const handleUpdatePassword = async () => {
-  if (passwords.new !== passwords.confirm) {
-    setError("Passwords do not match.");
-    return;
-  }
-  try {
-    await updatePassword({ oldPassword: passwords.old, newPassword: passwords.new });
-    toast({
-      title: "Password Updated",
-      description: "Your password has been changed successfully.",
-    });
-    setPasswords({ old: "", new: "", confirm: "" });
-  } catch (err) {
-    setError("Failed to update password. Please check your old password and try again.");
-    console.error("Password update error:", err);
-  }
-};
+  const validatePassword = (password: string) => {
+    const errors: string[] = [];
+    if (password.length < 8) {
+      //errors.push("Password must be at least 8 characters long.");
+      setError("Password must be at least 8 characters long.");
+      return false;
+    }
+    if (!/[0-9]/.test(password)) {
+      //errors.push("Password must contain at least 1 number.");
+      setError("Password must contain at least 1 number.");
+      return false;
+    }
+    if (!/[a-z]/.test(password)) {
+      //errors.push("Password must contain at least 1 lowercase letter.");
+      setError("Password must contain at least 1 lowercase letter.");
+      return false;
+    }
+    if (!/[A-Z]/.test(password)) {
+      //errors.push("Password must contain at least 1 uppercase letter.");
+      setError("Password must contain at least 1 uppercase letter.");
+      return false;
+    }
+    const specialCharPattern = /[^a-zA-Z0-9 ]/;
+    if (!specialCharPattern.test(password)) {
+      //errors.push("Password must contain at least 1 special character or a space.");
+      setError("Password must contain at least 1 special character or a space.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleUpdatePassword = async () => {
+    if (passwords.new !== passwords.confirm) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    if (!validatePassword(passwords.new)) {
+      return;
+    }
+
+    try {
+      await updatePassword({ oldPassword: passwords.old, newPassword: passwords.new });
+      toast({
+        title: "Password Updated",
+        description: "Your password has been changed successfully.",
+      });
+      setPasswords({ old: "", new: "", confirm: "" });
+    } catch (err) {
+      setError("Failed to update password. Please check your old password and try again.");
+      console.error("Password update error:", err);
+    }
+  };
 
   const handleSave = () => {
     toast({
@@ -84,7 +120,7 @@ const handleUpdatePassword = async () => {
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            
+
             <div>
               <h1 className="text-2xl font-bold text-navy-500">Settings</h1>
               <p className="text-gray-600">Manage your system configuration</p>

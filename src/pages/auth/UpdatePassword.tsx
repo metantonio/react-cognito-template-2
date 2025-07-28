@@ -16,6 +16,11 @@ const UpdatePassword = () => {
   const [error, setError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [passwords, setPasswords] = useState({
+    old: "",
+    new: "",
+    confirm: "",
+  });
 
   const validatePassword = (password: string) => {
     const errors: string[] = [];
@@ -39,73 +44,39 @@ const UpdatePassword = () => {
   };
 
   const handlePasswordChange = (field: string, value: string) => {
-    if (field === "old") {
-      setOldPassword(value);
+    setPasswords((prev) => ({ ...prev, [field]: value }));
+    if (field === "new" || field === "confirm") {
+      const newPassword = field === "new" ? value : passwords.new;
+      const confirmPassword = field === "confirm" ? value : passwords.confirm;
+      setError(newPassword && confirmPassword && newPassword !== confirmPassword ? "Passwords do not match." : "");
     }
-    else if (field === "new") {
-      setNewPassword(value);
-      const errors = validatePassword(value);
-      if (errors.length > 0) {
-        setPasswordError(errors.join(" "));
-      }
-      else if (confirmPassword && value === confirmPassword) {
-        setPasswordError("");
-      }
-      else if (confirmPassword && value !== confirmPassword) {
-        setPasswordError("Passwords do not match.");
-      }
-      else {
-        setPasswordError("");
-      }
+  };
+  const handleUpdatePassword = async () => {
+    if (passwords.new !== passwords.confirm) {
+      setError("Passwords do not match.");
+      return;
     }
-    else if (field === "confirm") {
-      setConfirmPassword(value);
-      if (newPassword !== value) {
-        setPasswordError("Passwords do not match.");
-      }
-      else {
-        const errors = validatePassword(newPassword);
-        if (errors.length > 0) {
-          setPasswordError(errors.join(" "));
-        }
-        else {
-          setPasswordError("");
-        }
-      }
+    try {
+      setIsLoading(true)
+      await updatePassword({ oldPassword: passwords.old, newPassword: passwords.new });
+      toast({
+        title: "Password Updated",
+        description: "Your password has been changed successfully.",
+      });
+      setPasswords({ old: "", new: "", confirm: "" });
+      setIsLoading(false)
+    } catch (err) {
+      setIsLoading(false)
+      setError("Failed to update password. Please check your old password and try again.");
+      console.error("Password update error:", err);
     }
   };
 
-  const handleUpdatePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    const validationErrors = validatePassword(newPassword);
-    if (validationErrors.length > 0) {
-      setPasswordError(validationErrors.join(" "));
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setPasswordError("Passwords do not match.");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await updatePassword({ oldPassword: oldPassword, newPassword: newPassword });
-      toast({
-        title: "Password Updated Successfully",
-        description: "Your password has been changed successfully.",
-      });
-      navigate('/adminpanel/login');
-    }
-    catch (err) {
-      console.error('Password update error:', err);
-      setError("Failed to update password. Please check your old password and try again.");
-    }
-    finally {
-      setIsLoading(false);
-    }
+  const handleSave = () => {
+    toast({
+      title: "Success",
+      description: "Settings saved successfully",
+    });
   };
 
   return (
@@ -130,7 +101,7 @@ const UpdatePassword = () => {
                 id="oldPassword"
                 type="password"
                 placeholder="Enter your old password"
-                value={oldPassword}
+                value={passwords.old}
                 onChange={(e) => handlePasswordChange("old", e.target.value)}
                 required
                 disabled={isLoading}
@@ -142,7 +113,7 @@ const UpdatePassword = () => {
                 id="newPassword"
                 type="password"
                 placeholder="Enter your new password"
-                value={newPassword}
+                value={passwords.new}
                 onChange={(e) => handlePasswordChange("new", e.target.value)}
                 required
                 disabled={isLoading}
@@ -155,7 +126,7 @@ const UpdatePassword = () => {
                 id="confirmPassword"
                 type="password"
                 placeholder="Re-enter new password"
-                value={confirmPassword}
+                value={passwords.confirm}
                 onChange={(e) => handlePasswordChange("confirm", e.target.value)}
                 required
                 disabled={isLoading}

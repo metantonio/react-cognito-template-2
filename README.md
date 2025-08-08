@@ -29,7 +29,7 @@
 - [Code Architecture Patterns](/docs/26_Code_Architecture_Patterns.md)
 - [Build and Deployment](/docs/27_Build_and_Deployment.md)
 
-## installation
+## Installation
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
@@ -51,7 +51,7 @@ cp ./src/.env.example ./src/.env
 ```
 
 
-# Step 5: Start the development server with auto-reloading and an instant preview.
+## Start the development server with auto-reloading and an instant preview.
 
 ```bash
 npm run dev

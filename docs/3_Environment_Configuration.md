@@ -156,7 +156,7 @@ Sources: [src/.env.example:1]()
 
 ## Local Development Setup
 
-1. **Create environment file**: Copy `src/.env.example` to `.env` in the project root
+1. **Create environment file**: Copy `src/.env.example` to `src/.env` in the src folder
 2. **Configure AWS Cognito**: Replace placeholder values with actual AWS Cognito User Pool details
 3. **Set API endpoint**: Configure `VITE_API_BASE` to point to your local or remote backend API
 4. **Verify configuration**: Ensure all required environment variables are set before starting the application

@@ -50,6 +50,7 @@ npm i primeicons
 cp ./src/.env.example ./src/.env
 ```
 
+Note: For more information visit [Getting Started Documentation](/docs/2_Getting_Started.md)
 
 ## Start the development server with auto-reloading and an instant preview.
 

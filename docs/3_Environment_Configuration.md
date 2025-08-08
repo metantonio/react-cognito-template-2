@@ -14,7 +14,7 @@ The following files were used as context for generating this wiki page:
 
 This document covers the environment variable setup and configuration required to run the CasinoVizion administrative panel. It explains how to configure AWS Cognito authentication, API endpoints, and other environment-specific settings.
 
-For information about the overall authentication system architecture, see [Authentication System](./3_Environment_Configuration.md). For details about the build and deployment process, see [Build and Deployment](./27_Build_and_Deployment.md).
+For information about the overall authentication system architecture, see [Authentication System](./5_Authentication_System.md). For details about the build and deployment process, see [Build and Deployment](./27_Build_and_Deployment.md).
 
 ## Purpose and Scope
 

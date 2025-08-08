@@ -163,7 +163,7 @@ Sources: [src/.env.example:1]()
 
 The application will fail to authenticate properly if any of the AWS Cognito environment variables are missing or incorrect.
 
-Sources: [src/.env.example:1-4]()
+Sources: [src/.env.example:1-4](/src/.env.example)
 
 ## Environment Variable Validation
 

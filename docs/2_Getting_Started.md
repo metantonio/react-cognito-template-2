@@ -262,4 +262,4 @@ After successful setup, explore these areas:
 
 The development server should now be running at `http://localhost:5173` with the CasinoVizion administrative panel ready for development.
 
-Sources: [README.md:1-72](), [package.json:1-92]()
+Sources: [README.md:1-72](/README.md), [package.json:1-92](/package.json)

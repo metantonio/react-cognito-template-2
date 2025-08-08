@@ -135,4 +135,4 @@ The application supports multiple development approaches:
 
 Key setup steps include dependency installation, environment configuration from `.env.example`, and running the Vite development server.
 
-Sources: [README.md:14-38]()
+Sources: [README.md:14-38](/README.md)

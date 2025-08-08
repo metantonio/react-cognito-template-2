@@ -255,10 +255,10 @@ Sources: [package.json:14-69](), [README.md:56-62]()
 
 After successful setup, explore these areas:
 
-1. **Authentication Configuration**: Set up AWS Cognito user pools and configure OAuth providers - see [Environment Configuration](#2.1)
-2. **Understanding Dependencies**: Learn about the UI component libraries and their usage - see [Dependencies and Tech Stack](#2.2)  
-3. **Application Architecture**: Explore the routing system and component organization - see [Application Architecture](#4)
-4. **Authentication System**: Understand login flows and user management - see [Authentication System](#3)
+1. **Authentication Configuration**: Set up AWS Cognito user pools and configure OAuth providers - see [Environment Configuration](./3_Environment_Configuration.md)
+2. **Understanding Dependencies**: Learn about the UI component libraries and their usage - see [Dependencies and Tech Stack](./4_Dependencies_and_Tech_Stack.md)  
+3. **Application Architecture**: Explore the routing system and component organization - see [Application Architecture](./11_Application_Architecture.md)
+4. **Authentication System**: Understand login flows and user management - see [Authentication System](./5_Authentication_System.md)
 
 The development server should now be running at `http://localhost:5173` with the CasinoVizion administrative panel ready for development.
 
